@@ -1,12 +1,4 @@
 //adding new chat docs
-
-//setting up a real-time listener to get new chats
-
-//updating the username
-
-//updating the room
-
-
 class Chatroom {
     constructor(room, username){
         this.room = room;
@@ -26,10 +18,32 @@ class Chatroom {
         const response = await this.chats.add(chat);
         return response;
     }
+    //setting up a real-time listener to get new chats
+    getChats(callback) {
+        this.chats
+            .where('room', '==', this.room)
+            .orderBy('created_at')
+            .onSnapshot(snapshot => {
+                snapshot.docChanges().forEach(change => {
+                    if(change.type === 'added'){
+                        //update UI not chat
+                        callback(change.doc.data())
+                    }
+                });
+            });
+    }
 }
 
 const chatroom = new Chatroom('gaming', 'shaun');
 
-chatroom.addChat('hello everyone')
-    .then(() => console.log('chat added'))
-    .catch(err => console.log(err));
+chatroom.getChats((data) => {
+    console.log(data);
+})
+
+
+
+//updating the username
+
+//updating the room
+
+
